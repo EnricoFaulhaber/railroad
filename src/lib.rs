@@ -560,6 +560,53 @@ impl RailroadNode for SimpleEnd {
 }
 
 
+/// A symbol indicating the logical start of a syntax-diagram via an arrow.
+#[derive(Debug)]
+pub struct ArrowStart;
+
+impl RailroadNode for ArrowStart {
+    fn entry_height(&self) -> i64 { 5 }
+    fn height(&self) -> i64 { 10 }
+    fn width(&self) -> i64 { 10 }
+
+    fn draw(&self, x: i64, y: i64, h_dir: HDir) -> svg::Element {
+        assert!(h_dir == HDir::LTR);
+        svg::PathData::new(h_dir)
+            .move_to(x, y)
+            .line_rel(5, 5)
+            .line_rel(-5, 5)
+            .move_rel(5, -5)
+            .horizontal(5)
+            .into_path()
+            .debug("Start", x, y, self)
+    }
+
+}
+
+/// A symbol indicating the logical end of a syntax-diagram via an arrow
+#[derive(Debug)]
+pub struct ArrowEnd;
+
+impl RailroadNode for ArrowEnd {
+    fn entry_height(&self) -> i64 { 5 }
+    fn height(&self) -> i64 { 10 }
+    fn width(&self) -> i64 { 10 }
+
+    fn draw(&self, x: i64, y: i64, h_dir: HDir) -> svg::Element {
+        assert!(h_dir == HDir::LTR);
+        svg::PathData::new(h_dir)
+            .move_to(x, y+5)
+            .horizontal(5)
+            .move_rel(-5, 5)
+            .line_rel(5, -5)
+            .line_rel(-5, -5)
+            .move_rel(5, 5)
+            .into_path()
+            .debug("ArrowEnd", x, y, self)
+    }
+}
+
+
 /// A symbol indicating the logical start of a syntax-diagram via two vertical bars.
 #[derive(Debug)]
 pub struct Start;
