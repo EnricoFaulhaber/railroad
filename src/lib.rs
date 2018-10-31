@@ -1248,13 +1248,14 @@ impl<T: RailroadNode, U: RailroadNode> RailroadNode for LabeledBox<T, U> {
 /// A label / verbatim text, drawn in-line
 #[derive(Debug)]
 pub struct Comment {
-    text: String,
+    lines: Vec<String>,
     attributes: collections::HashMap<String, String>
 }
 
 impl Comment {
     pub fn new(text: String) -> Self {
-        let mut c = Comment { text, attributes: collections::HashMap::new() };
+        let lines = text.split('\n').map(ToOwned::to_owned).collect();
+        let mut c = Comment { lines, attributes: collections::HashMap::new() };
         c.attributes.insert("class".to_owned(), "comment".to_owned());
         c
     }
@@ -1267,18 +1268,24 @@ impl Comment {
 
 impl RailroadNode for Comment {
     fn entry_height(&self) -> i64 { 10 }
-    fn height(&self) -> i64 { 20 }
+    fn height(&self) -> i64 { 20 * (self.lines.len() as i64) }
     fn width(&self) -> i64 {
-        text_width(&self.text) as i64 * 7 + 10
+        self.lines.iter().map(|s| text_width(s)).max().unwrap_or(0) as i64 * 7 + 10
     }
 
     fn draw(&self, x: i64, y: i64, _: HDir) -> svg::Element {
-        svg::Element::new("text")
-            .set_all(self.attributes.iter())
-            .set("x", x + self.width() / 2)
-            .set("y", y + 15)
-            .text(&self.text)
-            .debug("Comment", x, y, self)
+        let mut group = svg::Element::new("g");
+        for (i, line) in self.lines.iter().enumerate() {
+            group = group.add(
+                svg::Element::new("text")
+                    .set_all(self.attributes.iter())
+                    .set("x", x + self.width() / 2)
+                    .set("y", y + 15 + (i * 20) as i64)
+                    .text(line)
+                    .debug("Comment", x, y, self)
+            );
+        }
+        group
     }
 }
 
