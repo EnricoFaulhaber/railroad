@@ -1418,7 +1418,8 @@ impl<T: RailroadNode> RailroadNode for Diagram<T> {
             .set("xmlns", "http://www.w3.org/2000/svg")
             .set("xmlns:xlink", "http://www.w3.org/1999/xlink")
             .set("class", "railroad")
-            .set("viewBox", format!("0 0 {} {}", self.width(), self.height()));
+            .set("viewBox", format!("0 0 {} {}", self.width(), self.height()))
+            .set("width", format!("{}pt", self.width()*4/5));
         for (k, v) in &self.extra_attributes {
             e = e.set(k.clone(), v.clone());
         }
